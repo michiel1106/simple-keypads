@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 
 // copy from vanilla's Checkbox to be able to change the text color and remove the shadow
 public class CallbackCheckbox extends AbstractButton {
-    private static final ResourceLocation TEXTURE = new ResourceLocation("textures/gui/checkbox.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.parse("textures/gui/checkbox.png");
     private boolean selected;
     private final Consumer<Boolean> onChange;
     private final int textColor;

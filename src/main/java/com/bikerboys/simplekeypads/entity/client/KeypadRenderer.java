@@ -18,15 +18,8 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.decoration.ItemFrame;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.MapItem;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
-import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+
+import net.neoforged.api.distmarker.*;
 import org.jetbrains.annotations.NotNull;
 
 import static net.minecraft.client.renderer.entity.LivingEntityRenderer.getOverlayCoords;
@@ -69,8 +62,7 @@ public class KeypadRenderer extends EntityRenderer<KeypadEntity> {
                 poseStack,
                 vertexconsumer,
                 packedLight,
-                OverlayTexture.NO_OVERLAY,
-                1.0F, 1.0F, 1.0F, 1.0F
+                OverlayTexture.NO_OVERLAY
         );
 
         poseStack.popPose();

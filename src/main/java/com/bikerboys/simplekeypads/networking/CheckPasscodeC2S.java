@@ -7,84 +7,64 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.*;
+import net.minecraft.network.protocol.common.custom.*;
+import net.minecraft.resources.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.Block;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.*;
 
 import java.util.function.Supplier;
 
-public class CheckPasscodeC2S {
+public record CheckPasscodeC2S(BlockPos blockPos, Direction face, String code) implements CustomPacketPayload {
 
-    private final BlockPos blockPos;
-    private final String code;
-    private final Direction face;
+    public static final Type<CheckPasscodeC2S> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(SimpleKeypads.MODID, "check_passcode_c2s"));
 
+    public static final StreamCodec<FriendlyByteBuf, CheckPasscodeC2S> STREAM_CODEC =
+            StreamCodec.of(CheckPasscodeC2S::encode, CheckPasscodeC2S::decode);
 
-
-    public CheckPasscodeC2S(BlockPos blockPos, Direction face, String code) {
-        this.code = code;
-        this.blockPos = blockPos;
-        this.face = face;
+    private static CheckPasscodeC2S decode(FriendlyByteBuf buf) {
+        BlockPos pos = buf.readBlockPos();
+        Direction face = buf.readEnum(Direction.class);
+        String code = buf.readUtf();
+        return new CheckPasscodeC2S(pos, face, code);
     }
 
-    public CheckPasscodeC2S(FriendlyByteBuf buf) {
-
-        this(buf.readBlockPos(), buf.readEnum(Direction.class), buf.readUtf());
-
+    private static void encode(FriendlyByteBuf buf, CheckPasscodeC2S msg) {
+        buf.writeBlockPos(msg.blockPos);
+        buf.writeEnum(msg.face);
+        buf.writeUtf(msg.code);
     }
 
-    public void encode(FriendlyByteBuf buf) {
-
-        buf.writeBlockPos(this.blockPos);
-        buf.writeEnum(face);
-        buf.writeUtf(this.code);
-
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    public void handle(Supplier<NetworkEvent.Context> ctx) {
-
-
-        NetworkEvent.Context context = ctx.get();
-
+    public static void handle(CheckPasscodeC2S msg, IPayloadContext context) {
         context.enqueueWork(() -> {
+            ServerPlayer sender = (ServerPlayer) context.player();
+            if (sender == null) return;
 
-        ServerPlayer sender = context.getSender();
+            if (distanceTo(sender.blockPosition(), msg.blockPos) < 7) {
+                KeypadEntity keypadOnBlock = SimpleKeypads.getKeypadOnBlock(sender.level(), msg.blockPos, msg.face);
+                if (keypadOnBlock == null) return;
 
-        if (sender == null) return;
-
-        if (distanceTo(sender.blockPosition(), this.blockPos) < 7) {
-
-            KeypadEntity keypadOnBlock = SimpleKeypads.getKeypadOnBlock(context.getSender().level(), this.blockPos, this.face);
-            if (keypadOnBlock == null) return;
-
-            String keycode = keypadOnBlock.getKeycode();
-
-
-            if (keycode.equals(this.code)) {
-
-                SimpleKeypads.allowedplayercontext.add(new KeypadContext(sender, 200, blockPos, face));
-
-
-                sender.sendSystemMessage(Component.literal("Unlocked!"), true);
-
-                NetworkHandler.sendToPlayer(new UpdateAllowedBlockPosS2C(blockPos, true, face), sender);
-
-
+                String keycode = keypadOnBlock.getKeycode();
+                if (keycode.equals(msg.code)) {
+                    SimpleKeypads.allowedplayercontext.add(new KeypadContext(sender, 200, msg.blockPos, msg.face));
+                    sender.sendSystemMessage(Component.literal("Unlocked!"), true);
+                    NetworkHandler.sendToPlayer(new UpdateAllowedBlockPosS2C(msg.blockPos, true, msg.face), sender);
+                }
             }
-
-
-        }
-
         });
-
     }
 
-    public float distanceTo(BlockPos location1, BlockPos location2) {
-        float f = (float)(location1.getX() - location2.getX());
-        float f1 = (float)(location1.getY() - location2.getY());
-        float f2 = (float)(location1.getZ() - location2.getZ());
+    private static float distanceTo(BlockPos location1, BlockPos location2) {
+        float f = (float) (location1.getX() - location2.getX());
+        float f1 = (float) (location1.getY() - location2.getY());
+        float f2 = (float) (location1.getZ() - location2.getZ());
         return Mth.sqrt(f * f + f1 * f1 + f2 * f2);
     }
 }

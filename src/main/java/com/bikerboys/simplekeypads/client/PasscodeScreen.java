@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.lwjgl.glfw.GLFW;
 
 public class PasscodeScreen extends Screen {
-    private static final ResourceLocation TEXTURE = new ResourceLocation("simplekeypads:textures/gui/container/check_passcode.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.parse("simplekeypads:textures/gui/container/check_passcode.png");
     private static final Component COOLDOWN_TEXT_1 = Component.translatable("gui.securitycraft:passcode.cooldown1");
     private int cooldownText1XPos;
     private char[] allowedChars = {
@@ -97,13 +97,6 @@ public class PasscodeScreen extends Screen {
 
     }
 
-
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-
-        super.renderBackground(guiGraphics);
-
-    }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {

@@ -4,50 +4,54 @@ import com.bikerboys.simplekeypads.SimpleKeypads;
 import com.bikerboys.simplekeypads.entity.ModEntities;
 import com.bikerboys.simplekeypads.entity.custom.KeypadEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.*;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.Supplier;
+public record PlaceKeypadC2S(BlockPos clickedPos, int face, CompoundTag tag) implements CustomPacketPayload {
 
-public class PlaceKeypadC2S {
+    public static final Type<PlaceKeypadC2S> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(SimpleKeypads.MODID, "place_keypad_c2s"));
 
-    private final BlockPos clickedPos;
-    private final int face; // Direction 3D data value
-    private final CompoundTag tag; // optional item NBT
+    public static final StreamCodec<FriendlyByteBuf, PlaceKeypadC2S> STREAM_CODEC =
+            StreamCodec.of(PlaceKeypadC2S::encode, PlaceKeypadC2S::decode);
 
-    public PlaceKeypadC2S(BlockPos clickedPos, int face, CompoundTag tag) {
-        this.clickedPos = clickedPos;
-        this.face = face;
-        this.tag = tag;
+    private static PlaceKeypadC2S decode(FriendlyByteBuf buf) {
+        BlockPos pos = buf.readBlockPos();
+        int face = buf.readByte();
+        CompoundTag tag = buf.readNbt();
+        return new PlaceKeypadC2S(pos, face, tag);
     }
 
-    public PlaceKeypadC2S(FriendlyByteBuf buf) {
-        this.clickedPos = buf.readBlockPos();
-        this.face = buf.readByte();
-        this.tag = buf.readNbt();
+    private static void encode(FriendlyByteBuf buf, PlaceKeypadC2S msg) {
+        buf.writeBlockPos(msg.clickedPos);
+        buf.writeByte(msg.face);
+        buf.writeNbt(msg.tag);
     }
 
-    public void encode(FriendlyByteBuf buf) {
-        buf.writeBlockPos(clickedPos);
-        buf.writeByte(face);
-        buf.writeNbt(tag);
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    public void handle(Supplier<NetworkEvent.Context> ctx) {
-        NetworkEvent.Context context = ctx.get();
+    public static void handle(PlaceKeypadC2S msg, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ServerPlayer player = context.getSender();
+            ServerPlayer player = (ServerPlayer) context.player();
             if (player == null) return;
-            ServerLevel level = player.serverLevel();
 
-            var dir = net.minecraft.core.Direction.from3DDataValue(face);
-            BlockPos placePos = clickedPos.relative(dir);
+            ServerLevel level = player.serverLevel();
+            Direction dir = Direction.from3DDataValue(msg.face);
+            BlockPos placePos = msg.clickedPos.relative(dir);
 
             if (dir.getAxis().isVertical()) return;
 
@@ -55,7 +59,7 @@ public class PlaceKeypadC2S {
             if (held.isEmpty() || held.getItem() != SimpleKeypads.KEYPAD_ITEM.get()) return;
 
             KeypadEntity entity = new KeypadEntity(ModEntities.KEYPAD.get(), level, placePos, dir, dir);
-            if (tag != null) EntityType.updateCustomEntityTag(level, player, entity, tag);
+            if (msg.tag != null) EntityType.updateCustomEntityTag(level, player, entity, CustomData.of(msg.tag));
 
             if (entity.survives()) {
                 entity.playPlacementSound();
@@ -64,6 +68,5 @@ public class PlaceKeypadC2S {
                 level.addFreshEntity(entity);
             }
         });
-        context.setPacketHandled(true);
     }
 }

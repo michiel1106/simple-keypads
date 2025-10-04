@@ -8,17 +8,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.event.level.ExplosionEvent;
-import net.minecraftforge.event.level.PistonEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.*;
+import net.neoforged.fml.common.*;
+import net.neoforged.neoforge.event.entity.player.*;
 
-@Mod.EventBusSubscriber(modid = SimpleKeypads.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+
+@EventBusSubscriber(modid = SimpleKeypads.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class ForgeEvents {
 
 

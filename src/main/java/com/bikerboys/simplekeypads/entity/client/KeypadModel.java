@@ -58,9 +58,11 @@ public class KeypadModel<T extends Entity> extends EntityModel<T> {
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-		Body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		screen.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		Buttons.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+		Body.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		screen.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		Buttons.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
 	}
+
+
 }

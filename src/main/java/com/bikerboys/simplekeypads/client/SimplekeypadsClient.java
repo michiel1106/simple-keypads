@@ -4,21 +4,15 @@ package com.bikerboys.simplekeypads.client;
 import com.bikerboys.simplekeypads.SimpleKeypads;
 import com.bikerboys.simplekeypads.entity.custom.KeypadEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.*;
+import net.neoforged.bus.api.*;
+import net.neoforged.fml.common.*;
+import net.neoforged.neoforge.event.entity.player.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-@Mod.EventBusSubscriber(modid = SimpleKeypads.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE,value = Dist.CLIENT)
+@EventBusSubscriber(modid = SimpleKeypads.MODID, bus = EventBusSubscriber.Bus.GAME,value = Dist.CLIENT)
 public class SimplekeypadsClient {
 
 

@@ -31,7 +31,7 @@ public class KeypadItem extends Item {
         ItemStack stack = context.getItemInHand();
 
         if (level.isClientSide()) {
-            CompoundTag tag = stack.getTag();
+            CompoundTag tag = new CompoundTag();
             NetworkHandler.sendToServer(new PlaceKeypadC2S(clicked, face.get3DDataValue(), tag));
             return InteractionResult.SUCCESS;
         }

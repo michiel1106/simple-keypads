@@ -8,44 +8,35 @@ import com.bikerboys.simplekeypads.networking.NetworkHandler;
 import com.bikerboys.simplekeypads.networking.UpdateAllowedBlockPosS2C;
 import com.bikerboys.simplekeypads.util.KeypadContext;
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.gui.screens.social.PlayerEntry;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.protocol.game.ClientboundPlayerChatPacket;
+import net.minecraft.core.registries.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.HangingEntityItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+
+import net.neoforged.api.distmarker.*;
+import net.neoforged.bus.api.*;
+import net.neoforged.fml.*;
+import net.neoforged.fml.common.*;
+import net.neoforged.fml.event.lifecycle.*;
+import net.neoforged.neoforge.common.*;
+import net.neoforged.neoforge.event.*;
+import net.neoforged.neoforge.event.server.*;
+import net.neoforged.neoforge.event.tick.*;
+import net.neoforged.neoforge.registries.*;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-// The value here should match an entry in the META-INF/mods.toml file
+// The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(SimpleKeypads.MODID)
 public class SimpleKeypads
 {
@@ -56,24 +47,24 @@ public class SimpleKeypads
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, MODID);
 
 
-    public static final RegistryObject<Item> KEYPAD_ITEM = ITEMS.register("keypad",
+    public static final DeferredHolder<Item, KeypadItem> KEYPAD_ITEM = ITEMS.register("keypad",
             () -> new KeypadItem(new Item.Properties()));
 
-    public SimpleKeypads(FMLJavaModLoadingContext context)
+    public SimpleKeypads(IEventBus modEventBus, ModContainer container)
     {
 
-        IEventBus modEventBus = context.getModEventBus();
+
         ITEMS.register(modEventBus);
         ModEntities.register(modEventBus);
-
+        modEventBus.addListener(NetworkHandler::register);
         modEventBus.addListener(this::commonSetup);
 
         modEventBus.addListener(this::addCreative);
 
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
 
 
     }
@@ -81,18 +72,12 @@ public class SimpleKeypads
     private void commonSetup(final FMLCommonSetupEvent event)
     {
 
-        event.enqueueWork(() -> {
-
-            NetworkHandler.register();
-
-
-        });
     }
 
 
     public void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
-            event.accept(KEYPAD_ITEM);
+            event.accept(KEYPAD_ITEM.get());
         }
 
     }
@@ -153,7 +138,7 @@ public class SimpleKeypads
     }
 
     @SubscribeEvent
-    public void serverTick(TickEvent.ServerTickEvent tickEvent) {
+    public void serverTick(ServerTickEvent tickEvent) {
 
 
         Iterator<KeypadContext> iterator = allowedplayercontext.iterator();
@@ -185,7 +170,7 @@ public class SimpleKeypads
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents
     {
         @SubscribeEvent

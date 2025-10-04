@@ -2,19 +2,19 @@ package com.bikerboys.simplekeypads.entity;
 
 import com.bikerboys.simplekeypads.SimpleKeypads;
 import com.bikerboys.simplekeypads.entity.custom.KeypadEntity;
+import net.minecraft.core.registries.*;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.*;
+import net.neoforged.neoforge.registries.*;
+
 
 public class ModEntities {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
-            DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, SimpleKeypads.MODID);
+            DeferredRegister.create(Registries.ENTITY_TYPE, SimpleKeypads.MODID);
 
 
-    public static final RegistryObject<EntityType<KeypadEntity>> KEYPAD =
+    public static final DeferredHolder<EntityType<?>, EntityType<KeypadEntity>> KEYPAD =
             ENTITY_TYPES.register("keypad", () ->
                     EntityType.Builder.<KeypadEntity>of(KeypadEntity::new,
                                     MobCategory.MISC)

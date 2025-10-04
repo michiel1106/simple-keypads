@@ -3,15 +3,16 @@ package com.bikerboys.simplekeypads.events;
 import com.bikerboys.simplekeypads.SimpleKeypads;
 import com.bikerboys.simplekeypads.entity.client.KeypadModel;
 import com.bikerboys.simplekeypads.entity.client.ModModelLayers;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = SimpleKeypads.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+import net.neoforged.api.distmarker.*;
+import net.neoforged.bus.api.*;
+import net.neoforged.fml.common.*;
+import net.neoforged.neoforge.client.event.*;
+
+@EventBusSubscriber(modid = SimpleKeypads.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModEventBusClientEvents {
-    @SubscribeEvent
-    public static void registerLayer(EntityRenderersEvent.RegisterLayerDefinitions event) {
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void registerLayer(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(ModModelLayers.KEYPAD_LAYER, KeypadModel::createBodyLayer);
     }
 }

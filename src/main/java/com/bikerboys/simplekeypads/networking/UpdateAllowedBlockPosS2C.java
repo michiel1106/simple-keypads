@@ -2,68 +2,55 @@ package com.bikerboys.simplekeypads.networking;
 
 import com.bikerboys.simplekeypads.SimpleKeypads;
 import com.bikerboys.simplekeypads.client.ClientPacketHandler;
-import com.bikerboys.simplekeypads.entity.custom.KeypadEntity;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.Supplier;
+@OnlyIn(Dist.CLIENT)
+public record UpdateAllowedBlockPosS2C(BlockPos blockPos, boolean allowed, Direction face) implements CustomPacketPayload {
 
-public class UpdateAllowedBlockPosS2C {
+    public static final Type<UpdateAllowedBlockPosS2C> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(SimpleKeypads.MODID, "update_allowed_blockpos_s2c"));
 
-    private final BlockPos blockPos;
-    private final boolean allowed;
-    private final Direction face;
+    public static final StreamCodec<FriendlyByteBuf, UpdateAllowedBlockPosS2C> STREAM_CODEC =
+            StreamCodec.of(UpdateAllowedBlockPosS2C::encode, UpdateAllowedBlockPosS2C::decode);
 
-
-
-    public UpdateAllowedBlockPosS2C(BlockPos blockPos, Boolean allowed, Direction face) {
-        this.allowed = allowed;
-        this.blockPos = blockPos;
-        this.face = face;
+    private static UpdateAllowedBlockPosS2C decode(FriendlyByteBuf buf) {
+        BlockPos pos = buf.readBlockPos();
+        boolean allowed = buf.readBoolean();
+        Direction face = buf.readEnum(Direction.class);
+        return new UpdateAllowedBlockPosS2C(pos, allowed, face);
     }
 
-    public UpdateAllowedBlockPosS2C(FriendlyByteBuf buf) {
-
-        this(buf.readBlockPos(), buf.readBoolean(), buf.readEnum(Direction.class));
-
+    private static void encode(FriendlyByteBuf buf, UpdateAllowedBlockPosS2C msg) {
+        buf.writeBlockPos(msg.blockPos);
+        buf.writeBoolean(msg.allowed);
+        buf.writeEnum(msg.face);
     }
 
-    public void encode(FriendlyByteBuf buf) {
-
-        buf.writeBlockPos(this.blockPos);
-        buf.writeBoolean(this.allowed);
-        buf.writeEnum(this.face);
-
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-
-    public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
-
-        contextSupplier.get().enqueueWork(() -> {
-
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-
-                if (this.allowed) {
-                    if (!ClientPacketHandler.allowedblockpos.containsKey(blockPos)) {
-                        ClientPacketHandler.allowedblockpos.put(blockPos, face);
+    public static void handle(UpdateAllowedBlockPosS2C msg, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            // Make sure this only runs on the client
+            if (context.player().level().isClientSide) {
+                if (msg.allowed) {
+                    if (!ClientPacketHandler.allowedblockpos.containsKey(msg.blockPos)) {
+                        ClientPacketHandler.allowedblockpos.put(msg.blockPos, msg.face);
                     }
+                } else {
+                    ClientPacketHandler.allowedblockpos.remove(msg.blockPos);
                 }
-
-                if (!this.allowed) {
-                    ClientPacketHandler.allowedblockpos.remove(blockPos);
-                }
-
-
-
-            });
+            }
         });
-
-
     }
 }
