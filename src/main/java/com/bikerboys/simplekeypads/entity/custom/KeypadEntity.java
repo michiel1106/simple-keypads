@@ -1,10 +1,8 @@
 package com.bikerboys.simplekeypads.entity.custom;
 
 import com.bikerboys.simplekeypads.SimpleKeypads;
-import com.bikerboys.simplekeypads.client.PasscodeScreen;
 import com.bikerboys.simplekeypads.entity.ModEntities;
 import com.bikerboys.simplekeypads.util.KeypadContext;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -16,25 +14,19 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.HangingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.List;
 
 public class KeypadEntity extends HangingEntity {
@@ -78,6 +70,7 @@ public class KeypadEntity extends HangingEntity {
         return this.firstplaced;
     }
 
+
     @Override
     public boolean skipAttackInteraction(Entity entity) {
 
@@ -98,7 +91,16 @@ public class KeypadEntity extends HangingEntity {
     }
 
 
+    @Override
+    public boolean hurt(DamageSource damageSource, float amount) {
 
+        if (!damageSource.isIndirect()) {
+            return true;
+        }
+
+
+        return false;
+    }
 
     @Override
     public void push(Entity p_20293_) {
@@ -237,6 +239,8 @@ public class KeypadEntity extends HangingEntity {
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return new ClientboundAddEntityPacket(this, this.sanitizeDirection(direction).get3DDataValue(), this.getPos());
     }
+
+
 
 
     public boolean isAttachedToBlock(BlockPos blockPos) {
