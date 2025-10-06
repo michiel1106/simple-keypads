@@ -4,6 +4,7 @@ import com.bikerboys.simplekeypads.SimpleKeypads;
 import com.bikerboys.simplekeypads.entity.custom.KeypadEntity;
 import com.bikerboys.simplekeypads.util.KeypadContext;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.*;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -46,6 +47,12 @@ public class ForgeEvents {
                             break;
                         }
                     }
+                    if (event.getEntity() instanceof ServerPlayer player) {
+                        if (player.hasPermissions(2)) {
+                            allowed = true;
+                        }
+
+                    }
 
                     if (!allowed) {
                         event.setCanceled(true);
@@ -65,6 +72,13 @@ public class ForgeEvents {
                             allowed = true;
                             break;
                         }
+                    }
+
+                    if (event.getEntity() instanceof ServerPlayer player) {
+                        if (player.hasPermissions(2)) {
+                            allowed = true;
+                        }
+
                     }
 
                     if (!allowed) {
@@ -89,6 +103,12 @@ public class ForgeEvents {
                     allowed = true;
                     break;
                 }
+            }
+            if (event.getEntity() instanceof ServerPlayer player) {
+                if (player.hasPermissions(2)) {
+                    allowed = true;
+                }
+
             }
 
             if (!allowed) {
