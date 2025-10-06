@@ -25,13 +25,6 @@ file="META-INF/accesstransformer.cfg"
 # The description text for the mod (multi line!) (#mandatory)
 description='''${mod_description}'''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.${mod_id}]] #optional
-# the modid of the dependency
-modId="neoforge" #mandatory
-# Does this dependency have to exist - if not, ordering below must be specified
-mandatory=true #mandatory
-# The version range of the dependency
-versionRange="[${neo_version},)" #mandator
 
 ordering="NONE"
 # Side this dependency is applied on - BOTH, CLIENT, or SERVER

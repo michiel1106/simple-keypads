@@ -94,6 +94,7 @@ public class SimpleKeypads
                 }
             }
         }
+
         return null;
     }
 
@@ -138,7 +139,7 @@ public class SimpleKeypads
     }
 
     @SubscribeEvent
-    public void serverTick(ServerTickEvent tickEvent) {
+    public void serverTick(ServerTickEvent.Post tickEvent) {
 
 
         Iterator<KeypadContext> iterator = allowedplayercontext.iterator();

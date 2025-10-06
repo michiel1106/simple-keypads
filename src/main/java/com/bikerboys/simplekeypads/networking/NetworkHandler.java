@@ -26,7 +26,9 @@ public class NetworkHandler {
         registrar.playToServer(PlaceKeypadC2S.TYPE, PlaceKeypadC2S.STREAM_CODEC, PlaceKeypadC2S::handle);
 
         // S2C
+
         registrar.playToClient(UpdateAllowedBlockPosS2C.TYPE, UpdateAllowedBlockPosS2C.STREAM_CODEC, UpdateAllowedBlockPosS2C::handle);
+
     }
 
     // === Sending helpers ===

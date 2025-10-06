@@ -10,9 +10,10 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.fml.loading.*;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-@OnlyIn(Dist.CLIENT)
+
 public record UpdateAllowedBlockPosS2C(BlockPos blockPos, boolean allowed, Direction face) implements CustomPacketPayload {
 
     public static final Type<UpdateAllowedBlockPosS2C> TYPE =
@@ -40,9 +41,10 @@ public record UpdateAllowedBlockPosS2C(BlockPos blockPos, boolean allowed, Direc
     }
 
     public static void handle(UpdateAllowedBlockPosS2C msg, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            // Make sure this only runs on the client
-            if (context.player().level().isClientSide) {
+        if (FMLLoader.getDist() == Dist.CLIENT) {
+            context.enqueueWork(() -> {
+                // Run client-side updates only on the client dist
+
                 if (msg.allowed) {
                     if (!ClientPacketHandler.allowedblockpos.containsKey(msg.blockPos)) {
                         ClientPacketHandler.allowedblockpos.put(msg.blockPos, msg.face);
@@ -50,7 +52,9 @@ public record UpdateAllowedBlockPosS2C(BlockPos blockPos, boolean allowed, Direc
                 } else {
                     ClientPacketHandler.allowedblockpos.remove(msg.blockPos);
                 }
-            }
-        });
+            });
+
+        }
+
     }
 }

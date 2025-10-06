@@ -96,6 +96,20 @@ public class SetPasscodeScreen extends Screen {
     }
 
 
+    @Override
+    protected void renderBlurredBackground(float partialTick) {
+
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+
+    }
+
+    @Override
+    public void renderTransparentBackground(GuiGraphics guiGraphics) {
+
+    }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
