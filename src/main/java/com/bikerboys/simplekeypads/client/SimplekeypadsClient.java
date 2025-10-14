@@ -10,7 +10,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.*;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.ArrayList;
@@ -49,7 +49,10 @@ public class SimplekeypadsClient {
     public static void interactBlock(PlayerInteractEvent.RightClickBlock event) {
         if (event.getLevel().isClientSide) {
             if (Minecraft.getInstance().player.getMainHandItem().is(SimpleKeypads.KEYPAD_ITEM.get())) {
+                event.setUseBlock(Event.Result.DENY);
                 Minecraft.getInstance().setScreen(new SetPasscodeScreen(Component.literal("Set passcode"), event.getPos(), event.getFace()));
+
+
             }
 
         }

@@ -7,18 +7,15 @@ import com.bikerboys.simplekeypads.item.KeypadItem;
 import com.bikerboys.simplekeypads.networking.NetworkHandler;
 import com.bikerboys.simplekeypads.networking.UpdateAllowedBlockPosS2C;
 import com.bikerboys.simplekeypads.util.KeypadContext;
+import com.mojang.authlib.*;
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.gui.screens.social.PlayerEntry;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.protocol.game.ClientboundPlayerChatPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.*;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.HangingEntityItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -27,7 +24,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -35,6 +31,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.*;
+import net.minecraftforge.fml.loading.moddiscovery.*;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -43,12 +41,13 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(SimpleKeypads.MODID)
 public class SimpleKeypads
 {
+
+    public static boolean lootrInstalled = false;
 
     public static List<KeypadContext> allowedplayercontext = new ArrayList<>();
 
@@ -74,6 +73,12 @@ public class SimpleKeypads
         modEventBus.addListener(this::addCreative);
 
         MinecraftForge.EVENT_BUS.register(this);
+
+        ModFileInfo lootr = FMLLoader.getLoadingModList().getModFileById("lootr");
+
+        if (lootr != null) {
+            lootrInstalled = true;
+        }
 
 
     }
@@ -150,10 +155,13 @@ public class SimpleKeypads
     public void onServerStarting(ServerStartingEvent event)
     {
 
+
+        ;
     }
 
     @SubscribeEvent
     public void serverTick(TickEvent.ServerTickEvent tickEvent) {
+
 
 
         Iterator<KeypadContext> iterator = allowedplayercontext.iterator();
