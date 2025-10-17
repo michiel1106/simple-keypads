@@ -14,7 +14,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.*;
 import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.*;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.HangingEntity;
@@ -90,11 +90,19 @@ public class KeypadEntity extends HangingEntity {
         return true;
     }
 
-
     @Override
     public boolean hurt(DamageSource damageSource, float amount) {
 
+
+        if (damageSource.is(DamageTypes.PLAYER_ATTACK)) {
+            this.kill();
+            this.dropItem(this);
+            return true;
+        }
+
         if (damageSource.isDirect()) {
+            this.kill();
+            this.dropItem(this);
             return true;
         }
 

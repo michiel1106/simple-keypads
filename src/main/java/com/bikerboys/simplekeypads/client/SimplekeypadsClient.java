@@ -5,6 +5,7 @@ import com.bikerboys.simplekeypads.SimpleKeypads;
 import com.bikerboys.simplekeypads.entity.custom.KeypadEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.*;
 import net.neoforged.bus.api.*;
@@ -26,9 +27,7 @@ public class SimplekeypadsClient {
 
                 Minecraft instance = Minecraft.getInstance();
                 if (instance != null) {
-                    System.out.println(keypad.getAttachedFace());
-                    System.out.println(keypad.getOnPos());
-
+                    event.setCancellationResult(InteractionResult.FAIL);
                     instance.setScreen(new PasscodeScreen(Component.literal("Input passcode"), keypad.getOnPos(), keypad.getAttachedFace()));
                 }
 

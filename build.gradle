@@ -97,10 +97,21 @@ configurations {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    maven {
+
+
+        url "https://cursemaven.com"
+
+
+    }
+
 
 }
 
 dependencies {
+
+    compileOnly ("curse.maven:lootr-361276:6354238")
+
 
 
 }

@@ -1,6 +1,7 @@
 package com.bikerboys.simplekeypads.events;
 
 import com.bikerboys.simplekeypads.SimpleKeypads;
+import com.bikerboys.simplekeypads.compat.*;
 import com.bikerboys.simplekeypads.entity.custom.KeypadEntity;
 import com.bikerboys.simplekeypads.util.KeypadContext;
 import net.minecraft.core.BlockPos;
@@ -73,7 +74,12 @@ public class ForgeEvents {
                         if (player.hasPermissions(2)) {
                             allowed = true;
                         }
+                    }
 
+                    if (SimpleKeypads.lootrInstalled) {
+                        if (LootrCompat.isLootrChest(pos, event.getLevel())) {
+                            allowed = true;
+                        }
                     }
 
                     if (!allowed) {
@@ -104,8 +110,14 @@ public class ForgeEvents {
                 if (player.hasPermissions(2)) {
                     allowed = true;
                 }
-
             }
+
+            if (SimpleKeypads.lootrInstalled) {
+                if (LootrCompat.isLootrChest(pos, event.getLevel())) {
+                    allowed = true;
+                }
+            }
+
 
             if (!allowed) {
 

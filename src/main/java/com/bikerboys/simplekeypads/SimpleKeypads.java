@@ -25,6 +25,8 @@ import net.neoforged.bus.api.*;
 import net.neoforged.fml.*;
 import net.neoforged.fml.common.*;
 import net.neoforged.fml.event.lifecycle.*;
+import net.neoforged.fml.loading.*;
+import net.neoforged.fml.loading.moddiscovery.*;
 import net.neoforged.neoforge.common.*;
 import net.neoforged.neoforge.event.*;
 import net.neoforged.neoforge.event.server.*;
@@ -40,6 +42,8 @@ import java.util.List;
 @Mod(SimpleKeypads.MODID)
 public class SimpleKeypads
 {
+
+    public static boolean lootrInstalled = false;
 
     public static List<KeypadContext> allowedplayercontext = new ArrayList<>();
 
@@ -65,6 +69,16 @@ public class SimpleKeypads
         modEventBus.addListener(this::addCreative);
 
         NeoForge.EVENT_BUS.register(this);
+
+        ModFileInfo lootr = FMLLoader.getLoadingModList().getModFileById("lootr");
+
+
+
+
+
+        if (lootr != null) {
+            lootrInstalled = true;
+        }
 
 
     }
